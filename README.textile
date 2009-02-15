@@ -7,17 +7,87 @@ and borrows many of its concepts.
 Lemontree uses the excellent Ring library for underlying HTTP
 processing.
 
+
 h2. Basic assumptions and goals
 
-* Based on the widget tree concept -- applications are composed of
+* Based on a widget tree concept -- applications are composed of
   widgets that may be rendered.
 
 * Actions (rendered as links) modify the widget tree. Updated widgets
   are rendered and sent to the client either as JSON (AJAX) or full-page
   updates.
 
-* Based on the Yahoo User Interface Library (YUI) version 3.
+* Based on the Yahoo User Interface Library (YUI) version 3, using also
+  YUI2 widgets until YUI3 is complete.
 
 * Most functionality (within reason) degrades gracefully if Javascript
   isn't available.
+
+
+h2. Is Lemontree a good choice for me?
+
+* If you're looking for a way to quickly throw together a simple website
+  with a form or two, then Lemontree probably isn't the right choice.
+
+* If you want to work with full-page templates where only small details
+  are to be provided by the application, then Lemontree probably isn't
+  the right choice.
+
+* If you want to support a legacy URI-routing scheme with overlapping
+  URIs and convoluted logic, then Lemontree probably isn't the right
+  choice.
+
+* On the other hand, if you need to design modern AJAXy web applications
+  with complex logic and have them be small and maintainable, then
+  Lemontree should be just right for you.
+
+
+h2. Widget tree model
+
+In Lemontree all web pages are generated from a widget tree. Think of
+widgets as corresponding to (large) subtrees of the DOM. Each web page
+contains a root widget which in turn contains children widgets. During
+rendering, these are serialized to HTML and form the complete web page.
+
+URI routing is implemented by matching paths in the tree. For every
+request the URI is split into 'uri-tokens' (path elements that are
+normally separated by slashes) into a list of tokens. Each widget (tree
+element) may have a :path attribute. If that attribute is set, the
+widget will only be considered for a given request if the current URI
+token matches the :path attribute. Think of it as selecting subtrees
+in your full widget tree based on the URI.
+
+Once a token is matched, it is moved to the consumed-tokens stack, so
+that widgets down the tree do not see it anymore and are free to
+consider subsequent tokens in the token list.
+
+
+h2. Why YUI?
+
+There are many JavaScript libraries out there. Yes, jQuery is the
+coolest kid on the block today and all the cool kids use
+jQuery, Prototype is great too and Ruby on Rails uses Prototype... The
+list goes on.
+
+Lemontree uses YUI for the following reasons:
+
+* YUI has excellent documentation
+* It is developed by a paid (commercial) team with contributors
+* It is rigorously tested on a variety of major browsers on various
+  operating systems (forming a browser matrix)
+* There is a rich choice of widgets, so you can build applications using
+  only YUI, with very few additional libraries
+
+There are no plans to use any other foundation Javascript libraries in
+Lemontree and no plans to provide a "compatibility layer" so that many
+libraries can be supported.
+
+
+h2. Why PostgreSQL?
+
+It's good, it's free, it has all the features you might possibly want
+from a relational database.
+
+There are no plans to support other relational databases. It seriously
+isn't worth the effort.
 
