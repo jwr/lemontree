@@ -21,13 +21,13 @@
   [f]
   (fn [seed & more]
     (let [result (apply f seed more)]
-      (assoc seed :seq (cons result (:seq seed))))))
+      (assoc seed :render-list (cons result (:render-list seed))))))
 
 (defn unit-seed
   "Build an empty seed from loc and uri-tokens."
   [loc uri-tokens]
   (hash-map :tree-loc loc
-	    :seq nil
+	    :render-list nil
 	    :consumed-tokens nil
 	    :remaining-tokens uri-tokens))
 
@@ -63,7 +63,7 @@
 
 (defn render-widget-tree [widget-tree uri-tokens]
   (reverse
-   (:seq
+   (:render-list
     (binding [*remaining-tokens* uri-tokens]
       (foldts-matching-tokens
        (fn [seed] "")
