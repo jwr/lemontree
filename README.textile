@@ -1,0 +1,23 @@
+h1. Lemontree
+
+Lemontree is a web framework based on the widget tree concept. It is
+largely inspired by @Weblocks@ "weblocks":http://common-lisp.net/project/cl-weblocks/
+and borrows many of its concepts.
+
+Lemontree uses the excellent Ring library for underlying HTTP
+processing.
+
+h2. Basic assumptions and goals
+
+* Based on the widget tree concept -- applications are composed of
+  widgets that may be rendered.
+
+* Actions (rendered as links) modify the widget tree. Updated widgets
+  are rendered and sent to the client either as JSON (AJAX) or full-page
+  updates.
+
+* Based on the Yahoo User Interface Library (YUI) version 3.
+
+* Most functionality (within reason) degrades gracefully if Javascript
+  isn't available.
+

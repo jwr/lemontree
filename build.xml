@@ -1,0 +1,16 @@
+<project name="lemontree" default="jar">
+  <description>Pack all sources into a JAR.</description>
+
+  <property name="jarfile" location="lemontree.jar"/>
+
+  <target name="clean" description="Remove generated files and directories.">
+    <delete file="${jarfile}"/>
+  </target>
+
+  <target name="jar" description="Create jar file.">
+    <jar jarfile="${jarfile}">
+      <path location="LICENSE"/>
+      <fileset dir="./src" includes="lemontree/**/*.clj"/>
+    </jar>
+  </target>
+</project>
