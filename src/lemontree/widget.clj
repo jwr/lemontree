@@ -26,8 +26,7 @@
      (replace-children (make-widget type) children)))
 
 
-(defmulti render
-  (fn [widget] (:type widget)))
+(defmulti render :type)
 
 (defmethod render :widget [widget]
   (html [:h1 (:dom-id widget)]))
