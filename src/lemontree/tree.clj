@@ -51,12 +51,12 @@
 
 (defmacro with-token-match
   "Tries to match remaining URI-tokens agains the supplied seed. If
-try-matching is false, just executes body. Otherwise, calls
+try-matching? is false, just executes body. Otherwise, calls
 match-tokens, binds *remaining-tokens* and *consumed-tokens* to new
 values, executes body only if there is a match, otherwise simply returns
 the seed."
-  [try-matching seed & body]
-  `(if (not ~try-matching)
+  [try-matching? seed & body]
+  `(if (not ~try-matching?)
      ~@body
      (let [[match# consumed# remaining#]
 	   (match-tokens (zip/node (:tree-loc ~seed)) *remaining-tokens* *consumed-tokens*)]
@@ -69,16 +69,16 @@ the seed."
 (let [[down up right] (map lift-tree-op [zip/down zip/up zip/right])]
   (defn foldts
     "Perform a fold on a tree calling functions fdown fup and fhere at appropriate times."
-    ([fdown fup fhere seed try-matching lift-operation]
+    ([fdown fup fhere seed try-matching? lift-operation]
        (let [[fd fu fh] (map lift-operation [fdown fup fhere])]
-	 (with-token-match try-matching seed
+	 (with-token-match try-matching? seed
 	   (if (not (zip/branch? (:tree-loc seed)))
 	     (fh seed)			; call fhere on leaf nodes only
 	     (loop [kid-seed (down (fd seed))]
 	       (if (not (zip/right (:tree-loc kid-seed)))
-		 (up (fu (foldts fdown fup fhere kid-seed try-matching) seed))
-		 (recur (right (foldts fdown fup fhere kid-seed try-matching)))))))))
-    ([fdown fup fhere seed try-matching] (foldts fdown fup fhere seed try-matching lift-loc-op))
+		 (up (fu (foldts fdown fup fhere kid-seed try-matching?) seed))
+		 (recur (right (foldts fdown fup fhere kid-seed try-matching?)))))))))
+    ([fdown fup fhere seed try-matching?] (foldts fdown fup fhere seed try-matching? lift-loc-op))
     ([fdown fup fhere seed] (foldts fdown fup fhere seed true lift-loc-op))))
 
 
