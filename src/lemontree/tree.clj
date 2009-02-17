@@ -49,38 +49,50 @@
   [op-fn]
   (fn [seed] (assoc seed :tree-loc (op-fn (:tree-loc seed)))))
 
+(defmacro with-token-match
+  "Tries to match remaining URI-tokens agains the supplied seed. If
+try-matching is false, just executes body. Otherwise, calls
+match-tokens, binds *remaining-tokens* and *consumed-tokens* to new
+values, executes body only if there is a match, otherwise simply returns
+the seed."
+  [try-matching seed & body]
+  `(if (not ~try-matching)
+     ~@body
+     (let [[match# consumed# remaining#]
+	   (match-tokens (zip/node (:tree-loc ~seed)) *remaining-tokens* *consumed-tokens*)]
+       (if (not match#)
+	 ~seed
+	 (binding [*consumed-tokens* consumed#
+		   *remaining-tokens* remaining#]
+	   ~@body)))))
+
 (let [[down up right] (map lift-tree-op [zip/down zip/up zip/right])]
-  (defn foldts-matching-tokens
+  (defn foldts
     "Perform a fold on a tree calling functions fdown fup and fhere at appropriate times."
-    ([fdown fup fhere seed lift-operation]
+    ([fdown fup fhere seed try-matching lift-operation]
        (let [[fd fu fh] (map lift-operation [fdown fup fhere])]
-	 (let [[match consumed remaining]
-	       (match-tokens (zip/node (:tree-loc seed))
-			     *remaining-tokens*
-			     *consumed-tokens*)]
-	   (binding [*consumed-tokens* consumed
-		     *remaining-tokens* remaining]
-	     (if (not match)
-	       seed			; no path match, do nothing
-	       (let [here (fh seed)]	; process the "here" node
-		 (if (not (zip/branch? (:tree-loc seed)))
-		   here		      ; leaf node, so no more processing
-		   (loop [kid-seed (down (fd here))]
-		     (if (not (zip/right (:tree-loc kid-seed)))
-		       (up (fu (foldts-matching-tokens fdown fup fhere kid-seed) seed))
-		       (recur (right (foldts-matching-tokens fdown fup fhere kid-seed))))))))))))
-    ([fdown fup fhere seed] (foldts-matching-tokens fdown fup fhere seed lift-loc-op))))
+	 (with-token-match try-matching seed
+	   (if (not (zip/branch? (:tree-loc seed)))
+	     (fh seed)			; call fhere on leaf nodes only
+	     (loop [kid-seed (down (fd seed))]
+	       (if (not (zip/right (:tree-loc kid-seed)))
+		 (up (fu (foldts fdown fup fhere kid-seed try-matching) seed))
+		 (recur (right (foldts fdown fup fhere kid-seed try-matching)))))))))
+    ([fdown fup fhere seed try-matching] (foldts fdown fup fhere seed try-matching lift-loc-op))
+    ([fdown fup fhere seed] (foldts fdown fup fhere seed true lift-loc-op))))
+
 
 (defn render-widget-tree [widget-tree uri-tokens]
   (reverse
    (:render-list
     (binding [*remaining-tokens* uri-tokens]
-      (foldts-matching-tokens
-       (fn [seed] "")
+      (foldts
+       (fn [seed]
+	 (str "<div>" (render (zip/node (:tree-loc seed)))))
        (fn [seed old-seed]
 	 (println "fup -- consumed: " *consumed-tokens* "remaining: " *remaining-tokens*)
 	 "</div>")
        (fn [seed]
-	 (str "<div>" (render (zip/node (:tree-loc seed))) (when-not (zip/branch? (:tree-loc seed)) "</div>")))
+	 (str "<div>" (render (zip/node (:tree-loc seed))) "</div>"))
        (unit-seed widget-tree uri-tokens))))))
 
