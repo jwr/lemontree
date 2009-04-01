@@ -4,9 +4,29 @@ Lemontree is a web framework based on the widget tree concept. It is
 largely inspired by @Weblocks@ "weblocks":http://common-lisp.net/project/cl-weblocks/
 and borrows many of its concepts.
 
-Lemontree uses the excellent Ring library for underlying HTTP
-processing.
+Existing web programming frameworks are either too simplistic or too
+complex. On one side of the spectrum there is PHP and applications which
+are composed of web pages with embedded code. The problem with this
+approach is that it doesn't scale to complex applications and forces
+programmers into a simplistic design mindset. Resulting applications are
+composed of web pages with create, read, update, or delete
+functionality. AJAX is treated as a way to accelerate some of these
+interactions.
 
+On the other side of the spectrum there is the Enterprise Java
+monster. While it does decouple page generation from the application
+model, it is large and unnecessarily complex. A large part of this
+complexity is due to the limitations of the language.
+
+The guiding principle behind the design of Lemontree is best explained
+by a quote:
+
+bq. "A sentence should contain no unnecessary words, a paragraph no
+unnecessary sentences, for the same reason that a drawing should have no
+unnecessary lines and a machine no unnecessary parts. This requires not
+that the writer make all sentences short, or avoid all detail and treat
+all subjects only in outline, but that every word tell." _(Strunk and
+White, "The Elements of Style", fourth edition)_
 
 h2. Basic assumptions and goals
 
@@ -23,6 +43,8 @@ h2. Basic assumptions and goals
 * Most functionality (within reason) degrades gracefully if Javascript
   isn't available.
 
+Lemontree uses the excellent Ring library for underlying HTTP
+processing.
 
 h2. Is Lemontree a good choice for me?
 
